@@ -1,12 +1,12 @@
 import 'package:chat_app/config/theme/app_theme.dart';
 import 'package:chat_app/core/common/custom_button.dart';
 import 'package:chat_app/core/common/custom_text_field.dart';
-import 'package:chat_app/presentation/screen/auth/login_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class SignupScreen extends StatefulWidget {
-  static route() => MaterialPageRoute(builder: (context) => SignupScreen());
+  static route() => CupertinoPageRoute(builder: (context) => SignupScreen());
   const SignupScreen({super.key});
 
   @override
@@ -14,16 +14,73 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
+  final _formKey=GlobalKey<FormState>();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final _nameFocus=FocusNode();
+  final _passwordFocus=FocusNode();
+  final _emailFocus=FocusNode();
+  final _phoneFocus=FocusNode();
+  bool isPasswordVisible=false;
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _phoneController.dispose();
+    _nameFocus.dispose();
+    _passwordFocus.dispose();
+    _emailFocus.dispose();
+    _phoneFocus.dispose();
+    super.dispose();
+  }
+
+  String? _validateName(String? value){
+    if(value==null||value.isEmpty){
+      return 'Enter Name';
+    }
+    return null;
+  }
+  String? _validatePassword(String? value){
+    if(value==null||value.isEmpty){
+      return 'Enter Password';
+    }
+    if(value.length<6){
+      return 'Password must be at least 6 characters';
+    }
+    return null;
+  }
+  String? _validatePhone(String? value){
+    if(value==null||value.isEmpty){
+      return 'Enter phone number';
+    }
+    final phoneRegex = RegExp(r'^\+?[\d\s-]{10,}$');
+    if (!phoneRegex.hasMatch(value)) {
+      return 'Please enter a valid phone number (e.g., +1234567890)';
+    }
+    return null;
+  }
+  String? _validateEmail(String? value){
+    if(value==null||value.isEmpty){
+      return 'Enter valid Email';
+    }
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(value)) {
+      return 'Please enter a valid email address (e.g., example@email.com)';
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final TextEditingController nameController = TextEditingController();
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
-    final TextEditingController rePasswoerdController = TextEditingController();
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(title: Text('Sign up'), centerTitle: true),
-      body: SingleChildScrollView(
+      body: Form(
+        key: _formKey,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
           height: double.infinity,
@@ -32,93 +89,109 @@ class _SignupScreenState extends State<SignupScreen> {
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
             color: Colors.white,
           ),
-          child: Column(
-            children: [
-              Text(
-                'Hello!',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 30),
-              CustomTextField(
-                controller: nameController,
-                hintText: 'Name',
-                keybordType: TextInputType.text,
-                prefixIcon: Icons.person,
-              ),
-              const SizedBox(height: 20),
-              CustomTextField(
-                controller: emailController,
-                hintText: 'Email',
-                keybordType: TextInputType.text,
-                prefixIcon: Icons.email_rounded,
-              ),
-              const SizedBox(height: 20),
-              CustomTextField(
-                controller: passwordController,
-                hintText: 'Password',
-                keybordType: TextInputType.text,
-                prefixIcon: Icons.lock_open_rounded,
-                suffixIcon: Icons.visibility_rounded,
-                obscure: true,
-              ),
-              const SizedBox(height: 20),
-              CustomTextField(
-                controller: rePasswoerdController,
-                hintText: 'Confirm Password',
-                keybordType: TextInputType.text,
-                prefixIcon: Icons.lock_open_rounded,
-                suffixIcon: Icons.visibility_rounded,
-                obscure: true,
-              ),
-              const SizedBox(height: 30),
-              CustomButton(onPressed: () {}, text: 'Sign up'),
-              const SizedBox(height: 30),
-              Row(
-                children: [
-                  Expanded(child: Divider(thickness: 1.5, color: Colors.grey)),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Text('or'),
-                  ),
-                  Expanded(child: Divider(thickness: 1.5, color: Colors.grey)),
-                ],
-              ),
-              const SizedBox(height: 30),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset('assets/image/google.png', height: 50, width: 50),
-                  Image.asset('assets/image/apple.png', height: 50, width: 50),
-                  Image.asset(
-                    'assets/image/facebook.png',
-                    height: 50,
-                    width: 50,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              RichText(
-                text: TextSpan(
-                  text: 'Do not have an account?',
-                  style: TextStyle(color: Colors.black),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Text(
+                  'Hello!',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 30),
+                CustomTextField(
+                  controller: _nameController,
+                  hintText: 'Name',
+                  keybordType: TextInputType.text,
+                  prefixIcon: Icon(Icons.person,color: Colors.grey,),
+                  focusNode: _nameFocus,
+                  validator: _validateName,
+                ),
+                const SizedBox(height: 20),
+                CustomTextField(
+                  controller: _emailController,
+                  hintText: 'Email',
+                  keybordType: TextInputType.text,
+                  prefixIcon:Icon(Icons.email_rounded,color: Colors.grey,),
+                  focusNode: _emailFocus,
+                  validator: _validateEmail,
+                ),
+                const SizedBox(height: 20),
+                CustomTextField(
+                  controller: _phoneController,
+                  hintText: 'phone number',
+                  keybordType: TextInputType.text,
+                  prefixIcon: Icon(Icons.phone,color: Colors.grey,),
+
+                  obscure: true,
+                  focusNode: _phoneFocus,
+                  validator: _validatePhone,
+                ),
+
+                const SizedBox(height: 20),
+                CustomTextField(
+                  controller: _passwordController,
+                  hintText: 'Password',
+                  keybordType: TextInputType.text,
+                  prefixIcon: Icon(Icons.lock_open_rounded,color: Colors.grey,),
+                  suffixIcon: IconButton(onPressed: (){setState(() {
+                    isPasswordVisible=!isPasswordVisible;
+                  });}, icon: Icon(isPasswordVisible? Icons.visibility_rounded:Icons.visibility_off_rounded,color: Colors.grey,)),
+                  obscure: !isPasswordVisible,
+                  focusNode: _passwordFocus,
+                  validator: _validatePassword,
+                ),
+                const SizedBox(height: 30),
+                CustomButton(onPressed: () {
+                  FocusScope.of(context).unfocus();
+                  if(_formKey.currentState?.validate()??false){}
+                }, text: 'Sign up'),
+                const SizedBox(height: 30),
+                Row(
                   children: [
-                    TextSpan(
-                      text: ' Sign In',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.primaryColor,
-                      ),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          Navigator.push(context, LoginScreen.route());
-                        },
+                    Expanded(child: Divider(thickness: 1.5, color: Colors.grey)),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Text('or'),
+                    ),
+                    Expanded(child: Divider(thickness: 1.5, color: Colors.grey)),
+                  ],
+                ),
+                const SizedBox(height: 30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset('assets/image/google.png', height: 50, width: 50),
+                    Image.asset('assets/image/apple.png', height: 50, width: 50),
+                    Image.asset(
+                      'assets/image/facebook.png',
+                      height: 50,
+                      width: 50,
                     ),
                   ],
                 ),
-              ),
-            ],
+                const SizedBox(height: 20),
+                RichText(
+                  text: TextSpan(
+                    text: 'Do not have an account?',
+                    style: TextStyle(color: Colors.black),
+                    children: [
+                      TextSpan(
+                        text: ' Sign In',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.primaryColor,
+                        ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            Navigator.pop(context);
+                          },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

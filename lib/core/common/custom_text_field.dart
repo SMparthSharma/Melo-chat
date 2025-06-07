@@ -5,8 +5,8 @@ class CustomTextField extends StatelessWidget {
   final String hintText;
   final bool obscure;
   final TextInputType keybordType;
-  final IconData? prefixIcon;
-  final IconData? suffixIcon;
+  final Widget? prefixIcon;
+  final Widget? suffixIcon;
   final FocusNode? focusNode;
   final String? Function(String?)? validator;
   const CustomTextField({
@@ -29,11 +29,13 @@ class CustomTextField extends StatelessWidget {
       keyboardType: keybordType,
       obscureText: obscure,
       validator: validator,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       cursorColor: Colors.grey,
+      cursorErrorColor: Colors.grey,
       decoration: InputDecoration(
         hintText: hintText,
-        prefixIcon: Icon(prefixIcon, color: Colors.grey),
-        suffixIcon: Icon(suffixIcon, color: Colors.grey),
+        prefixIcon: prefixIcon,
+        suffixIcon: suffixIcon,
       ),
     );
   }

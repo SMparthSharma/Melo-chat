@@ -45,6 +45,15 @@ class AppTheme {
         borderRadius: BorderRadius.circular(40),
         borderSide: BorderSide(width: 2, color: Colors.grey),
       ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(40),
+        borderSide: BorderSide(width: 2, color: Colors.red),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(40),
+        borderSide: BorderSide(width: 2, color: Colors.grey),
+      ),
+
     ),
   );
 }
