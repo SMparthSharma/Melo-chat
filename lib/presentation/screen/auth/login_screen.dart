@@ -1,13 +1,13 @@
 import 'package:chat_app/config/theme/app_theme.dart';
 import 'package:chat_app/core/common/custom_button.dart';
 import 'package:chat_app/core/common/custom_text_field.dart';
+import 'package:chat_app/data/services/service_locator.dart';
 import 'package:chat_app/presentation/screen/auth/signUp_screen.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:chat_app/router/app_router.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatefulWidget {
-  static route() => CupertinoPageRoute(builder: (context) => LoginScreen());
   const LoginScreen({super.key});
 
   @override
@@ -15,22 +15,23 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _formKey=GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final _focusEmail=FocusNode();
-  final _focusPassword=FocusNode();
-  bool isPasswordVisible=false;
+  final _focusEmail = FocusNode();
+  final _focusPassword = FocusNode();
+  bool isPasswordVisible = false;
   @override
   void dispose() {
-_emailController.dispose();
-_passwordController.dispose();
-_focusEmail.dispose();
-_focusPassword.dispose();
-super.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _focusEmail.dispose();
+    _focusPassword.dispose();
+    super.dispose();
   }
-  String? _validateEmail(String? value){
-    if(value==null||value.isEmpty){
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
       return 'Please Enter Email';
     }
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
@@ -39,16 +40,17 @@ super.dispose();
     }
     return null;
   }
-  String? _validatePassword(String? value){
-    if(value==null||value.isEmpty){
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
       return 'Please Enter Password';
     }
 
     return null;
   }
+
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(),
@@ -87,7 +89,10 @@ super.dispose();
                         controller: _emailController,
                         hintText: 'Email',
                         keybordType: TextInputType.emailAddress,
-                        prefixIcon:Icon(Icons.email_rounded,color: Colors.grey,),
+                        prefixIcon: Icon(
+                          Icons.email_rounded,
+                          color: Colors.grey,
+                        ),
                         focusNode: _focusEmail,
                         validator: _validateEmail,
                       ),
@@ -96,11 +101,24 @@ super.dispose();
                         controller: _passwordController,
                         hintText: 'Password',
                         keybordType: TextInputType.text,
-                        prefixIcon:Icon(Icons.lock_open_rounded,color: Colors.grey,),
+                        prefixIcon: Icon(
+                          Icons.lock_open_rounded,
+                          color: Colors.grey,
+                        ),
                         obscure: !isPasswordVisible,
-                        suffixIcon: IconButton(onPressed: (){setState(() {
-                          isPasswordVisible= !isPasswordVisible;
-                        });}, icon: Icon(isPasswordVisible? Icons.visibility_rounded:Icons.visibility_off_rounded,color: Colors.grey,)),
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              isPasswordVisible = !isPasswordVisible;
+                            });
+                          },
+                          icon: Icon(
+                            isPasswordVisible
+                                ? Icons.visibility_rounded
+                                : Icons.visibility_off_rounded,
+                            color: Colors.grey,
+                          ),
+                        ),
                         focusNode: _focusPassword,
                         validator: _validatePassword,
                       ),
@@ -110,10 +128,13 @@ super.dispose();
                         children: [Text('forgot password?  ')],
                       ),
                       const SizedBox(height: 40),
-                      CustomButton(onPressed: () {
-                        FocusScope.of(context).unfocus();
-                        if(_formKey.currentState?.validate()??false){}
-                      }, text: 'Sign in'),
+                      CustomButton(
+                        onPressed: () {
+                          FocusScope.of(context).unfocus();
+                          if (_formKey.currentState?.validate() ?? false) {}
+                        },
+                        text: 'Sign in',
+                      ),
                       const SizedBox(height: 30),
                       Row(
                         children: [
@@ -121,7 +142,9 @@ super.dispose();
                             child: Divider(thickness: 1.5, color: Colors.grey),
                           ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                            ),
                             child: Text('or'),
                           ),
                           Expanded(
@@ -164,7 +187,7 @@ super.dispose();
                               ),
                               recognizer: TapGestureRecognizer()
                                 ..onTap = () {
-                                  Navigator.push(context, SignupScreen.route());
+                                  getIt<AppRouter>().push(SignupScreen());
                                 },
                             ),
                           ],
@@ -181,5 +204,3 @@ super.dispose();
     );
   }
 }
-
-

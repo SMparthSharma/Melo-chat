@@ -1,12 +1,12 @@
 import 'package:chat_app/config/theme/app_theme.dart';
 import 'package:chat_app/core/common/custom_button.dart';
 import 'package:chat_app/core/common/custom_text_field.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:chat_app/data/services/service_locator.dart';
+import 'package:chat_app/router/app_router.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class SignupScreen extends StatefulWidget {
-  static route() => CupertinoPageRoute(builder: (context) => SignupScreen());
   const SignupScreen({super.key});
 
   @override
@@ -14,16 +14,16 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-  final _formKey=GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
-  final _nameFocus=FocusNode();
-  final _passwordFocus=FocusNode();
-  final _emailFocus=FocusNode();
-  final _phoneFocus=FocusNode();
-  bool isPasswordVisible=false;
+  final _nameFocus = FocusNode();
+  final _passwordFocus = FocusNode();
+  final _emailFocus = FocusNode();
+  final _phoneFocus = FocusNode();
+  bool isPasswordVisible = false;
   @override
   void dispose() {
     _nameController.dispose();
@@ -37,35 +37,37 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  String? _validateName(String? value){
-    if(value==null||value.isEmpty){
+  String? _validateName(String? value) {
+    if (value == null || value.isEmpty) {
       return 'Enter Name';
     }
     return null;
   }
-  String? _validatePassword(String? value){
-    if(value==null||value.isEmpty){
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
       return 'Enter Password';
     }
-    if(value.length<6){
+    if (value.length < 6) {
       return 'Password must be at least 6 characters';
     }
     return null;
   }
-  String? _validatePhone(String? value){
-    if(value==null||value.isEmpty){
+
+  String? _validatePhone(String? value) {
+    if (value == null || value.isEmpty) {
       return 'Enter phone number';
     }
     final phoneRegex = RegExp(r'^[6-9]\d{9}$');
-
 
     if (!phoneRegex.hasMatch(value)) {
       return 'Please enter a valid phone number (e.g., +1234567890)';
     }
     return null;
   }
-  String? _validateEmail(String? value){
-    if(value==null||value.isEmpty){
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
       return 'Enter valid Email';
     }
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
@@ -77,7 +79,6 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(title: Text('Sign up'), centerTitle: true),
@@ -105,7 +106,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   controller: _nameController,
                   hintText: 'Name',
                   keybordType: TextInputType.text,
-                  prefixIcon: Icon(Icons.person,color: Colors.grey,),
+                  prefixIcon: Icon(Icons.person, color: Colors.grey),
                   focusNode: _nameFocus,
                   validator: _validateName,
                 ),
@@ -114,7 +115,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   controller: _emailController,
                   hintText: 'Email',
                   keybordType: TextInputType.text,
-                  prefixIcon:Icon(Icons.email_rounded,color: Colors.grey,),
+                  prefixIcon: Icon(Icons.email_rounded, color: Colors.grey),
                   focusNode: _emailFocus,
                   validator: _validateEmail,
                 ),
@@ -123,7 +124,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   controller: _phoneController,
                   hintText: 'phone number',
                   keybordType: TextInputType.text,
-                  prefixIcon: Icon(Icons.phone,color: Colors.grey,),
+                  prefixIcon: Icon(Icons.phone, color: Colors.grey),
 
                   obscure: true,
                   focusNode: _phoneFocus,
@@ -135,36 +136,61 @@ class _SignupScreenState extends State<SignupScreen> {
                   controller: _passwordController,
                   hintText: 'Password',
                   keybordType: TextInputType.text,
-                  prefixIcon: Icon(Icons.lock_open_rounded,color: Colors.grey,),
-                  suffixIcon: IconButton(onPressed: (){setState(() {
-                    isPasswordVisible=!isPasswordVisible;
-                  });}, icon: Icon(isPasswordVisible? Icons.visibility_rounded:Icons.visibility_off_rounded,color: Colors.grey,)),
+                  prefixIcon: Icon(Icons.lock_open_rounded, color: Colors.grey),
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        isPasswordVisible = !isPasswordVisible;
+                      });
+                    },
+                    icon: Icon(
+                      isPasswordVisible
+                          ? Icons.visibility_rounded
+                          : Icons.visibility_off_rounded,
+                      color: Colors.grey,
+                    ),
+                  ),
                   obscure: !isPasswordVisible,
                   focusNode: _passwordFocus,
                   validator: _validatePassword,
                 ),
                 const SizedBox(height: 30),
-                CustomButton(onPressed: () {
-                  FocusScope.of(context).unfocus();
-                  if(_formKey.currentState?.validate()??false){}
-                }, text: 'Sign up'),
+                CustomButton(
+                  onPressed: () {
+                    FocusScope.of(context).unfocus();
+                    if (_formKey.currentState?.validate() ?? false) {}
+                  },
+                  text: 'Sign up',
+                ),
                 const SizedBox(height: 30),
                 Row(
                   children: [
-                    Expanded(child: Divider(thickness: 1.5, color: Colors.grey)),
+                    Expanded(
+                      child: Divider(thickness: 1.5, color: Colors.grey),
+                    ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Text('or'),
                     ),
-                    Expanded(child: Divider(thickness: 1.5, color: Colors.grey)),
+                    Expanded(
+                      child: Divider(thickness: 1.5, color: Colors.grey),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 30),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset('assets/image/google.png', height: 50, width: 50),
-                    Image.asset('assets/image/apple.png', height: 50, width: 50),
+                    Image.asset(
+                      'assets/image/google.png',
+                      height: 50,
+                      width: 50,
+                    ),
+                    Image.asset(
+                      'assets/image/apple.png',
+                      height: 50,
+                      width: 50,
+                    ),
                     Image.asset(
                       'assets/image/facebook.png',
                       height: 50,
@@ -186,7 +212,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         ),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            Navigator.pop(context);
+                            getIt<AppRouter>().pop(context);
                           },
                       ),
                     ],

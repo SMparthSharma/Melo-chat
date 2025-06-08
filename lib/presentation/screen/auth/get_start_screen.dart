@@ -1,5 +1,7 @@
 import 'package:chat_app/core/common/custom_button.dart';
+import 'package:chat_app/data/services/service_locator.dart';
 import 'package:chat_app/presentation/screen/auth/login_screen.dart';
+import 'package:chat_app/router/app_router.dart';
 import 'package:flutter/material.dart';
 
 class GetStartScreen extends StatelessWidget {
@@ -19,7 +21,7 @@ class GetStartScreen extends StatelessWidget {
             width: MediaQuery.of(context).size.width * 0.7,
             child: CustomButton(
               onPressed: () {
-                Navigator.push(context, LoginScreen.route());
+                getIt<AppRouter>().push(LoginScreen());
               },
               text: 'Get started',
             ),
