@@ -2,8 +2,10 @@ import 'dart:developer';
 
 import 'package:chat_app/data/models/user_model.dart';
 import 'package:chat_app/data/services/base_repository.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthRepository extends BaseReposisory {
+  Stream<User?> get authStateChanges => auth.authStateChanges();
   Future<UserModel> signUp({
     required String userName,
     required String email,
@@ -74,5 +76,9 @@ class AuthRepository extends BaseReposisory {
     } catch (e) {
       throw 'user data not found';
     }
+  }
+
+  Future<void> signOut() async {
+    await auth.signOut();
   }
 }

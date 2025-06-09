@@ -1,11 +1,14 @@
 import 'package:chat_app/config/theme/app_theme.dart';
 import 'package:chat_app/core/common/custom_button.dart';
 import 'package:chat_app/core/common/custom_text_field.dart';
-import 'package:chat_app/data/repositories/auth_repository.dart';
 import 'package:chat_app/data/services/service_locator.dart';
+import 'package:chat_app/logic/cubit/auth/auth_cubit.dart';
+import 'package:chat_app/logic/cubit/auth/auth_state.dart';
+import 'package:chat_app/presentation/screen/home/home_screen.dart';
 import 'package:chat_app/router/app_router.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -82,7 +85,7 @@ class _SignupScreenState extends State<SignupScreen> {
     FocusScope.of(context).unfocus();
     if (_formKey.currentState?.validate() ?? false) {
       try {
-        getIt<AuthRepository>().signUp(
+        getIt<AuthCubit>().signUp(
           userName: _nameController.text,
           email: _emailController.text,
           phoneNumber: _phoneController.text,
@@ -100,143 +103,168 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(title: Text('Sign up'), centerTitle: true),
-      body: Form(
-        key: _formKey,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-          height: double.infinity,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            color: Colors.white,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                Text(
-                  'Hello!',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 30),
-                CustomTextField(
-                  controller: _nameController,
-                  hintText: 'Name',
-                  keybordType: TextInputType.text,
-                  prefixIcon: Icon(Icons.person, color: Colors.grey),
-                  focusNode: _nameFocus,
-                  validator: _validateName,
-                ),
-                const SizedBox(height: 20),
-                CustomTextField(
-                  controller: _emailController,
-                  hintText: 'Email',
-                  keybordType: TextInputType.text,
-                  prefixIcon: Icon(Icons.email_rounded, color: Colors.grey),
-                  focusNode: _emailFocus,
-                  validator: _validateEmail,
-                ),
-                const SizedBox(height: 20),
-                CustomTextField(
-                  controller: _phoneController,
-                  hintText: 'phone number',
-                  keybordType: TextInputType.text,
-                  prefixIcon: Icon(Icons.phone, color: Colors.grey),
-
-                  focusNode: _phoneFocus,
-                  validator: _validatePhone,
-                ),
-
-                const SizedBox(height: 20),
-                CustomTextField(
-                  controller: _passwordController,
-                  hintText: 'Password',
-                  keybordType: TextInputType.text,
-                  prefixIcon: Icon(Icons.lock_open_rounded, color: Colors.grey),
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        isPasswordVisible = !isPasswordVisible;
-                      });
-                    },
-                    icon: Icon(
-                      isPasswordVisible
-                          ? Icons.visibility_rounded
-                          : Icons.visibility_off_rounded,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  obscure: !isPasswordVisible,
-                  focusNode: _passwordFocus,
-                  validator: _validatePassword,
-                ),
-                const SizedBox(height: 30),
-                CustomButton(onPressed: signupHandler, text: 'Sign up'),
-                const SizedBox(height: 30),
-                Row(
+    return BlocConsumer<AuthCubit, AuthState>(
+      bloc: getIt<AuthCubit>(),
+      listenWhen: (previous, current) {
+        return previous.status != current.status ||
+            previous.error != current.error;
+      },
+      listener: (context, state) {
+        if (state.status == AuthStatus.loading) {
+          Scaffold(body: Center(child: CircularProgressIndicator()));
+        }
+        if (state.status == AuthStatus.authenticated) {
+          getIt<AppRouter>().pushAndRemoveUntil(const HomeScreen());
+        }
+      },
+      builder: (context, state) {
+        if (state.status == AuthStatus.loading) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        return Scaffold(
+          backgroundColor: Colors.black,
+          appBar: AppBar(title: Text('Sign up'), centerTitle: true),
+          body: Form(
+            key: _formKey,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+              height: double.infinity,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                color: Colors.white,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
                   children: [
-                    Expanded(
-                      child: Divider(thickness: 1.5, color: Colors.grey),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Text('or'),
-                    ),
-                    Expanded(
-                      child: Divider(thickness: 1.5, color: Colors.grey),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 30),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'assets/image/google.png',
-                      height: 50,
-                      width: 50,
-                    ),
-                    Image.asset(
-                      'assets/image/apple.png',
-                      height: 50,
-                      width: 50,
-                    ),
-                    Image.asset(
-                      'assets/image/facebook.png',
-                      height: 50,
-                      width: 50,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                RichText(
-                  text: TextSpan(
-                    text: 'Do not have an account?',
-                    style: TextStyle(color: Colors.black),
-                    children: [
-                      TextSpan(
-                        text: ' Sign In',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.primaryColor,
-                        ),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            getIt<AppRouter>().pop(context);
-                          },
+                    Text(
+                      'Hello!',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
                       ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 30),
+                    CustomTextField(
+                      controller: _nameController,
+                      hintText: 'Name',
+                      keybordType: TextInputType.text,
+                      prefixIcon: Icon(Icons.person, color: Colors.grey),
+                      focusNode: _nameFocus,
+                      validator: _validateName,
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      controller: _emailController,
+                      hintText: 'Email',
+                      keybordType: TextInputType.text,
+                      prefixIcon: Icon(Icons.email_rounded, color: Colors.grey),
+                      focusNode: _emailFocus,
+                      validator: _validateEmail,
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      controller: _phoneController,
+                      hintText: 'phone number',
+                      keybordType: TextInputType.text,
+                      prefixIcon: Icon(Icons.phone, color: Colors.grey),
+
+                      focusNode: _phoneFocus,
+                      validator: _validatePhone,
+                    ),
+
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      controller: _passwordController,
+                      hintText: 'Password',
+                      keybordType: TextInputType.text,
+                      prefixIcon: Icon(
+                        Icons.lock_open_rounded,
+                        color: Colors.grey,
+                      ),
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            isPasswordVisible = !isPasswordVisible;
+                          });
+                        },
+                        icon: Icon(
+                          isPasswordVisible
+                              ? Icons.visibility_rounded
+                              : Icons.visibility_off_rounded,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      obscure: !isPasswordVisible,
+                      focusNode: _passwordFocus,
+                      validator: _validatePassword,
+                    ),
+                    const SizedBox(height: 30),
+                    CustomButton(onPressed: signupHandler, text: 'Sign up'),
+                    const SizedBox(height: 30),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Divider(thickness: 1.5, color: Colors.grey),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text('or'),
+                        ),
+                        Expanded(
+                          child: Divider(thickness: 1.5, color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/image/google.png',
+                          height: 50,
+                          width: 50,
+                        ),
+                        Image.asset(
+                          'assets/image/apple.png',
+                          height: 50,
+                          width: 50,
+                        ),
+                        Image.asset(
+                          'assets/image/facebook.png',
+                          height: 50,
+                          width: 50,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    RichText(
+                      text: TextSpan(
+                        text: 'Do not have an account?',
+                        style: TextStyle(color: Colors.black),
+                        children: [
+                          TextSpan(
+                            text: ' Sign In',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.primaryColor,
+                            ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                getIt<AppRouter>().pop(context);
+                              },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
