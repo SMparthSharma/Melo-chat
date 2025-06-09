@@ -1,6 +1,7 @@
 import 'package:chat_app/config/theme/app_theme.dart';
 import 'package:chat_app/core/common/custom_button.dart';
 import 'package:chat_app/core/common/custom_text_field.dart';
+import 'package:chat_app/data/repositories/auth_repository.dart';
 import 'package:chat_app/data/services/service_locator.dart';
 import 'package:chat_app/presentation/screen/auth/signUp_screen.dart';
 import 'package:chat_app/router/app_router.dart';
@@ -47,6 +48,24 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     return null;
+  }
+
+  Future<void> loginHandler() async {
+    FocusScope.of(context).unfocus();
+    if (_formKey.currentState?.validate() ?? false) {
+      try {
+        getIt<AuthRepository>().signIn(
+          email: _emailController.text,
+          password: _passwordController.text,
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
+      }
+    } else {
+      print('from validation failed');
+    }
   }
 
   @override
@@ -128,13 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [Text('forgot password?  ')],
                       ),
                       const SizedBox(height: 40),
-                      CustomButton(
-                        onPressed: () {
-                          FocusScope.of(context).unfocus();
-                          if (_formKey.currentState?.validate() ?? false) {}
-                        },
-                        text: 'Sign in',
-                      ),
+                      CustomButton(onPressed: loginHandler, text: 'Sign in'),
                       const SizedBox(height: 30),
                       Row(
                         children: [

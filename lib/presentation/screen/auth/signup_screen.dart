@@ -1,6 +1,7 @@
 import 'package:chat_app/config/theme/app_theme.dart';
 import 'package:chat_app/core/common/custom_button.dart';
 import 'package:chat_app/core/common/custom_text_field.dart';
+import 'package:chat_app/data/repositories/auth_repository.dart';
 import 'package:chat_app/data/services/service_locator.dart';
 import 'package:chat_app/router/app_router.dart';
 import 'package:flutter/gestures.dart';
@@ -77,6 +78,26 @@ class _SignupScreenState extends State<SignupScreen> {
     return null;
   }
 
+  Future<void> signupHandler() async {
+    FocusScope.of(context).unfocus();
+    if (_formKey.currentState?.validate() ?? false) {
+      try {
+        getIt<AuthRepository>().signUp(
+          userName: _nameController.text,
+          email: _emailController.text,
+          phoneNumber: _phoneController.text,
+          password: _passwordController.text,
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
+      }
+    } else {
+      print('form validation failed');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -126,7 +147,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   keybordType: TextInputType.text,
                   prefixIcon: Icon(Icons.phone, color: Colors.grey),
 
-                  obscure: true,
                   focusNode: _phoneFocus,
                   validator: _validatePhone,
                 ),
@@ -155,13 +175,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   validator: _validatePassword,
                 ),
                 const SizedBox(height: 30),
-                CustomButton(
-                  onPressed: () {
-                    FocusScope.of(context).unfocus();
-                    if (_formKey.currentState?.validate() ?? false) {}
-                  },
-                  text: 'Sign up',
-                ),
+                CustomButton(onPressed: signupHandler, text: 'Sign up'),
                 const SizedBox(height: 30),
                 Row(
                   children: [
