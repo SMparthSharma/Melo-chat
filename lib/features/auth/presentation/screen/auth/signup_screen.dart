@@ -1,11 +1,14 @@
+import 'dart:developer';
+
 import 'package:chat_app/config/theme/app_theme.dart';
 import 'package:chat_app/core/common/custom_button.dart';
 import 'package:chat_app/core/common/custom_text_field.dart';
-import 'package:chat_app/data/services/service_locator.dart';
-import 'package:chat_app/logic/cubit/auth/auth_cubit.dart';
-import 'package:chat_app/logic/cubit/auth/auth_state.dart';
-import 'package:chat_app/presentation/screen/home/home_screen.dart';
-import 'package:chat_app/router/app_router.dart';
+import 'package:chat_app/core/router/app_router.dart';
+import 'package:chat_app/core/util/custom_snack_bar.dart';
+import 'package:chat_app/logic/auth_cubit/auth_cubit.dart';
+import 'package:chat_app/logic/auth_cubit/auth_state.dart';
+import 'package:chat_app/service_locator.dart';
+import 'package:chat_app/features/home/home_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -85,19 +88,17 @@ class _SignupScreenState extends State<SignupScreen> {
     FocusScope.of(context).unfocus();
     if (_formKey.currentState?.validate() ?? false) {
       try {
-        getIt<AuthCubit>().signUp(
+        await getIt<AuthCubit>().signUp(
           userName: _nameController.text,
           email: _emailController.text,
           phoneNumber: _phoneController.text,
           password: _passwordController.text,
         );
       } catch (e) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(e.toString())));
+        throw e.toString();
       }
     } else {
-      print('form validation failed');
+      log('form validation failed');
     }
   }
 
@@ -105,24 +106,15 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget build(BuildContext context) {
     return BlocConsumer<AuthCubit, AuthState>(
       bloc: getIt<AuthCubit>(),
-      listenWhen: (previous, current) {
-        return previous.status != current.status ||
-            previous.error != current.error;
-      },
+
       listener: (context, state) {
-        if (state.status == AuthStatus.loading) {
-          Scaffold(body: Center(child: CircularProgressIndicator()));
-        }
         if (state.status == AuthStatus.authenticated) {
           getIt<AppRouter>().pushAndRemoveUntil(const HomeScreen());
+        } else if (state.status == AuthStatus.error && state.error != null) {
+          CustomSnackBar.snackBar(context, state.error!);
         }
       },
       builder: (context, state) {
-        if (state.status == AuthStatus.loading) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
         return Scaffold(
           backgroundColor: Colors.black,
           appBar: AppBar(title: Text('Sign up'), centerTitle: true),
@@ -201,7 +193,18 @@ class _SignupScreenState extends State<SignupScreen> {
                       validator: _validatePassword,
                     ),
                     const SizedBox(height: 30),
-                    CustomButton(onPressed: signupHandler, text: 'Sign up'),
+                    CustomButton(
+                      onPressed: signupHandler,
+                      child: state.status == AuthStatus.loading
+                          ? CircularProgressIndicator(color: Colors.white)
+                          : Text(
+                              'Create Account',
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.white,
+                              ),
+                            ),
+                    ),
                     const SizedBox(height: 30),
                     Row(
                       children: [

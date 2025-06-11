@@ -1,12 +1,13 @@
 import 'dart:async';
 
-import 'package:chat_app/data/repositories/auth_repository.dart';
-import 'package:chat_app/logic/cubit/auth/auth_state.dart';
+import 'package:chat_app/features/auth/data/repositories/auth_repository.dart';
+import 'package:chat_app/logic/auth_cubit/auth_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final AuthRepository _authRepository;
+  // ignore: unused_field
   StreamSubscription<User?>? _authStateSubscription;
 
   AuthCubit({required AuthRepository authRepository})

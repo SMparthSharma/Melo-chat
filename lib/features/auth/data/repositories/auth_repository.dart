@@ -1,7 +1,7 @@
 import 'dart:developer';
 
-import 'package:chat_app/data/models/user_model.dart';
-import 'package:chat_app/data/services/base_repository.dart';
+import 'package:chat_app/features/auth/data/models/user_model.dart';
+import 'package:chat_app/features/auth/data/repositories/base_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthRepository extends BaseReposisory {
@@ -17,6 +17,10 @@ class AuthRepository extends BaseReposisory {
         RegExp(r'\s+'),
         "".trim(),
       );
+      final phoneNumberExist = await isPhoneNumberExist(formatedPhoneNumber);
+      if (phoneNumberExist) {
+        throw 'The phone number is already in use by another account';
+      }
       final userCredential = await auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
@@ -33,8 +37,9 @@ class AuthRepository extends BaseReposisory {
       await saveUserData(user);
       return user;
     } catch (e) {
-      log(e.toString());
-      rethrow;
+      log("from AuthRepository signup method ${e.toString()}");
+
+      throw trimExceptionMessage(e.toString());
     }
   }
 
@@ -61,8 +66,8 @@ class AuthRepository extends BaseReposisory {
       final userData = await getUserData(userCredential.user!.uid);
       return userData;
     } catch (e) {
-      log(e.toString());
-      rethrow;
+      log("from AuthRepository signin method ${e.toString()}");
+      throw "Either email or password is incorrect";
     }
   }
 
@@ -80,5 +85,28 @@ class AuthRepository extends BaseReposisory {
 
   Future<void> signOut() async {
     await auth.signOut();
+  }
+
+  Future<bool> isPhoneNumberExist(String phoneNumber) async {
+    try {
+      final isPhoneNumbeer = await firestore
+          .collection('users')
+          .where('phoneNumber', isEqualTo: phoneNumber)
+          .get();
+      return isPhoneNumbeer.docs.isNotEmpty;
+    } catch (e) {
+      log('error: on isPhoneNumberExist method ${e.toString()}');
+      return false;
+    }
+  }
+
+  String trimExceptionMessage(String message) {
+    String errorMessage = message;
+    int index = errorMessage.indexOf(']');
+
+    if (index != -1 && index < errorMessage.length - 1) {
+      errorMessage = errorMessage.substring(index + 1).trim();
+    }
+    return errorMessage;
   }
 }
