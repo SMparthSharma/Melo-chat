@@ -22,7 +22,7 @@ class AppTheme {
 
     // AppBar Theme
     appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.black,
+      backgroundColor: primaryColor,
       elevation: 0,
       centerTitle: false,
       titleTextStyle: TextStyle(
@@ -53,7 +53,6 @@ class AppTheme {
         borderRadius: BorderRadius.circular(40),
         borderSide: BorderSide(width: 2, color: Colors.grey),
       ),
-
     ),
   );
 }

@@ -19,17 +19,30 @@ class HomeScreen extends StatelessWidget {
         }
       },
       builder: (context, state) {
-        if (state.status == AuthStatus.loading) {
-          return Scaffold(body: Center(child: CircularProgressIndicator()));
-        }
         return Scaffold(
-          body: Center(
-            child: ElevatedButton(
-              onPressed: () async {
-                await getIt<AuthCubit>().signOut();
-              },
-              child: const Text('signout'),
-            ),
+          appBar: AppBar(
+            title: Text('Melo'),
+            actions: [
+              IconButton(
+                onPressed: () async => await getIt<AuthCubit>().signOut(),
+                icon: Icon(Icons.logout_rounded),
+              ),
+            ],
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {},
+            child: Icon(Icons.chat_rounded, color: Colors.white),
+          ),
+          body: ListView.builder(
+            itemCount: 10,
+            itemBuilder: (context, index) {
+              return ListTile(
+                leading: CircleAvatar(
+                  child: Image.asset('assets/image/google.png'),
+                ),
+                title: Text('parth'),
+              );
+            },
           ),
         );
       },

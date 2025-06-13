@@ -87,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
       builder: (context, state) {
         return Scaffold(
           backgroundColor: Colors.black,
-          appBar: AppBar(),
+          appBar: AppBar(backgroundColor: Colors.black),
           body: Form(
             key: _formKey,
             child: Column(
