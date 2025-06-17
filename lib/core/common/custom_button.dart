@@ -1,4 +1,4 @@
-import 'package:chat_app/config/theme/app_theme.dart';
+import 'package:chat_app/config/theme/color.dart';
 import 'package:flutter/material.dart';
 
 class CustomButton extends StatelessWidget {
@@ -23,7 +23,7 @@ class CustomButton extends StatelessWidget {
                 await onPressed?.call();
               },
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppTheme.primaryColor,
+          backgroundColor: ColorPalette.primery,
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
         ),
         child:

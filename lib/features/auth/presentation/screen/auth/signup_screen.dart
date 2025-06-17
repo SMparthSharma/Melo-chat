@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:chat_app/config/theme/app_theme.dart';
+import 'package:chat_app/config/theme/color.dart';
 import 'package:chat_app/core/common/custom_button.dart';
 import 'package:chat_app/core/common/custom_text_field.dart';
 import 'package:chat_app/core/router/app_router.dart';
@@ -255,7 +255,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             text: ' Sign In',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: AppTheme.primaryColor,
+                              color: ColorPalette.primery,
                             ),
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {

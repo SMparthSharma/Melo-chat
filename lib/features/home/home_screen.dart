@@ -1,3 +1,4 @@
+import 'package:chat_app/config/theme/color.dart';
 import 'package:chat_app/core/router/app_router.dart';
 import 'package:chat_app/features/auth/presentation/screen/auth/login_screen.dart';
 import 'package:chat_app/logic/auth_cubit/auth_cubit.dart';
@@ -41,6 +42,15 @@ class HomeScreen extends StatelessWidget {
                   child: Image.asset('assets/image/google.png'),
                 ),
                 title: Text('parth'),
+                subtitle: Text('new message'),
+                trailing: Card(
+                  shape: CircleBorder(),
+                  color: ColorPalette.primery,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text('1'),
+                  ),
+                ),
               );
             },
           ),
