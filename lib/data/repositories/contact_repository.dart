@@ -11,9 +11,15 @@ class ContactRepository extends BaseReposisory {
     return await FlutterContacts.requestPermission();
   }
 
-  // get phoneNumber from divice
   Future<List<Map<String, dynamic>>> getRegisterContact() async {
     try {
+      bool hasPermission = await requestContactPermission();
+      if (!hasPermission) {
+        log('Contacts permission denied');
+        return [];
+      }
+
+      // get phoneNumber from divice
       final contacts = await FlutterContacts.getContacts(
         withPhoto: true,
         withProperties: true,
@@ -33,7 +39,7 @@ class ContactRepository extends BaseReposisory {
           );
       //get user form firestore
       final userSnapshot = await firestore.collection("users").get();
-      final registerUser = await userSnapshot.docs
+      final registerUser = userSnapshot.docs
           .map((doc) => UserModel.fromFireStore(doc))
           .toList();
 
