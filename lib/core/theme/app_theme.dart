@@ -1,4 +1,4 @@
-import 'package:chat_app/config/theme/color.dart';
+import 'package:chat_app/core/theme/color.dart';
 import 'package:flutter/material.dart';
 
 class AppTheme {
@@ -20,6 +20,7 @@ class AppTheme {
       onPrimary:
           Colors.black87, // Dark text on primary color for better contrast
     ),
+    scaffoldBackgroundColor: Colors.white,
 
     // AppBar Theme
     appBarTheme: AppBarTheme(

@@ -1,26 +1,26 @@
 import 'dart:developer';
 
-import 'package:chat_app/config/theme/color.dart';
 import 'package:chat_app/core/common/custom_button.dart';
 import 'package:chat_app/core/common/custom_text_field.dart';
 import 'package:chat_app/core/router/app_router.dart';
+import 'package:chat_app/core/theme/color.dart';
 import 'package:chat_app/core/util/custom_snack_bar.dart';
-import 'package:chat_app/features/home/home_screen.dart';
+import 'package:chat_app/presentation/home/home_page.dart';
 import 'package:chat_app/logic/auth_cubit/auth_cubit.dart';
 import 'package:chat_app/logic/auth_cubit/auth_state.dart';
-import 'package:chat_app/service_locator.dart';
+import 'package:chat_app/data/service/service_locator.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class SignupScreen extends StatefulWidget {
-  const SignupScreen({super.key});
+class SignupPage extends StatefulWidget {
+  const SignupPage({super.key});
 
   @override
-  State<SignupScreen> createState() => _SignupScreenState();
+  State<SignupPage> createState() => _SignupPageState();
 }
 
-class _SignupScreenState extends State<SignupScreen> {
+class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -109,19 +109,15 @@ class _SignupScreenState extends State<SignupScreen> {
 
       listener: (context, state) {
         if (state.status == AuthStatus.authenticated) {
-          getIt<AppRouter>().pushAndRemoveUntil(const HomeScreen());
+          getIt<AppRouter>().pushAndRemoveUntil(const HomePage());
         } else if (state.status == AuthStatus.error && state.error != null) {
           CustomSnackBar.snackBar(context, state.error!);
         }
       },
       builder: (context, state) {
         return Scaffold(
-          backgroundColor: Colors.black,
-          appBar: AppBar(
-            backgroundColor: Colors.black,
-            title: Text('Sign up'),
-            centerTitle: true,
-          ),
+          backgroundColor: ColorPalette.primery,
+          appBar: AppBar(title: Text('Sign up'), centerTitle: true),
           body: Form(
             key: _formKey,
             child: Container(

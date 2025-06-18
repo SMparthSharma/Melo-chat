@@ -1,7 +1,7 @@
 import 'dart:developer';
 
-import 'package:chat_app/features/auth/data/models/user_model.dart';
-import 'package:chat_app/features/auth/data/repositories/base_repository.dart';
+import 'package:chat_app/data/models/user_model.dart';
+import 'package:chat_app/data/service/base_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthRepository extends BaseReposisory {

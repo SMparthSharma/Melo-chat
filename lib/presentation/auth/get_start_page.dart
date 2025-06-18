@@ -1,16 +1,16 @@
 import 'package:chat_app/core/common/custom_button.dart';
-import 'package:chat_app/features/auth/presentation/screen/auth/login_screen.dart';
 import 'package:chat_app/core/router/app_router.dart';
-import 'package:chat_app/service_locator.dart';
+import 'package:chat_app/data/service/service_locator.dart';
+import 'package:chat_app/presentation/auth/login_page.dart';
 import 'package:flutter/material.dart';
 
-class GetStartScreen extends StatelessWidget {
-  const GetStartScreen({super.key});
+class GetStartPage extends StatelessWidget {
+  const GetStartPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      //backgroundColor: Colors.black,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         spacing: 50,
@@ -21,7 +21,7 @@ class GetStartScreen extends StatelessWidget {
             width: MediaQuery.of(context).size.width * 0.7,
             child: CustomButton(
               onPressed: () {
-                getIt<AppRouter>().push(LoginScreen());
+                getIt<AppRouter>().push(LoginPage());
               },
               text: 'Get started',
             ),

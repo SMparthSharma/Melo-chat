@@ -1,4 +1,4 @@
-import 'package:chat_app/features/auth/data/repositories/auth_repository.dart';
+import 'package:chat_app/data/repositories/auth_repository.dart';
 import 'package:chat_app/firebase_options.dart';
 import 'package:chat_app/logic/auth_cubit/auth_cubit.dart';
 import 'package:chat_app/core/router/app_router.dart';

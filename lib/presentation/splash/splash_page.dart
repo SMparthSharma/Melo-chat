@@ -1,20 +1,20 @@
 import 'package:chat_app/core/router/app_router.dart';
-import 'package:chat_app/features/auth/presentation/screen/auth/get_start_screen.dart';
-import 'package:chat_app/features/home/home_screen.dart';
+import 'package:chat_app/presentation/auth/get_start_page.dart';
+import 'package:chat_app/presentation/home/home_page.dart';
 import 'package:chat_app/logic/auth_cubit/auth_cubit.dart';
 import 'package:chat_app/logic/auth_cubit/auth_state.dart';
-import 'package:chat_app/service_locator.dart';
+import 'package:chat_app/data/service/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+class SplashPage extends StatefulWidget {
+  const SplashPage({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  State<SplashPage> createState() => _SplashPageState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashPageState extends State<SplashPage> {
   void wait(Widget screen) async {
     await Future.delayed(Duration(seconds: 2));
     getIt<AppRouter>().pushReplacement(screen);
@@ -26,9 +26,9 @@ class _SplashScreenState extends State<SplashScreen> {
       bloc: getIt<AuthCubit>(),
       listener: (context, state) {
         if (state.status == AuthStatus.authenticated) {
-          wait(HomeScreen());
+          wait(HomePage());
         } else {
-          wait(GetStartScreen());
+          wait(GetStartPage());
         }
       },
       builder: (context, state) {

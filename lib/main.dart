@@ -1,6 +1,6 @@
-import 'package:chat_app/config/theme/app_theme.dart';
-import 'package:chat_app/features/splash/presentartion/screen/splash_screen.dart';
-import 'package:chat_app/service_locator.dart';
+import 'package:chat_app/core/theme/app_theme.dart';
+import 'package:chat_app/presentation/splash/splash_page.dart';
+import 'package:chat_app/data/service/service_locator.dart';
 import 'package:chat_app/core/router/app_router.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       navigatorKey: getIt<AppRouter>().navigatorKey,
       theme: AppTheme.lightTheme,
-      home: const SplashScreen(),
+      home: const SplashPage(),
     );
   }
 }
