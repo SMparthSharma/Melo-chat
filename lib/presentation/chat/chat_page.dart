@@ -66,7 +66,7 @@ class _ChatPageState extends State<ChatPage> {
                     senderId: '45345',
                     receiverId: '435345',
                     content:
-                        'content gjhgkjghjghjgkjgkjgkjgjgjjhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhgjhgjhg',
+                        'Thank you for getting back to me. I appreciate your response.Please do keep me in mind for any future openings that align with my profile. I would be happy to connect again if any opportunities arise.',
                     timestamp: Timestamp.now(),
                     readBy: [],
                     status: MessageStatus.read,
@@ -137,6 +137,7 @@ class MessageBubble extends StatelessWidget {
           bottom: 10,
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
               message.content,
@@ -146,27 +147,30 @@ class MessageBubble extends StatelessWidget {
                 fontWeight: FontWeight.w500,
               ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              spacing: 5,
-              children: [
-                Text(
-                  '5:00',
-                  style: TextStyle(
-                    color: isMe ? Colors.white : Colors.black,
-                    fontSize: 10,
+            SizedBox(
+              width: 50,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                spacing: 5,
+                children: [
+                  Text(
+                    '5:00',
+                    style: TextStyle(
+                      color: isMe ? Colors.white : Colors.black,
+                      fontSize: 10,
+                    ),
                   ),
-                ),
-                isMe
-                    ? Icon(
-                        Icons.done_all_rounded,
-                        color: message.status == MessageStatus.read
-                            ? Colors.green
-                            : Colors.white,
-                        size: 16,
-                      )
-                    : Text(''),
-              ],
+                  isMe
+                      ? Icon(
+                          Icons.done_all_rounded,
+                          color: message.status == MessageStatus.read
+                              ? Colors.green
+                              : Colors.white,
+                          size: 16,
+                        )
+                      : Text(''),
+                ],
+              ),
             ),
           ],
         ),
