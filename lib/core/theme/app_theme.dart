@@ -20,7 +20,7 @@ class AppTheme {
       onPrimary:
           Colors.black87, // Dark text on primary color for better contrast
     ),
-    scaffoldBackgroundColor: Colors.white,
+    scaffoldBackgroundColor: ColorPalette.light,
 
     // AppBar Theme
     appBarTheme: AppBarTheme(

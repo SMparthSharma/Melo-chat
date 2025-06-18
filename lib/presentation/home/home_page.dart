@@ -5,6 +5,7 @@ import 'package:chat_app/presentation/auth/login_page.dart';
 import 'package:chat_app/logic/auth_cubit/auth_cubit.dart';
 import 'package:chat_app/logic/auth_cubit/auth_state.dart';
 import 'package:chat_app/data/service/service_locator.dart';
+import 'package:chat_app/presentation/chat/chat_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -63,7 +64,15 @@ class _HomePageState extends State<HomePage> {
                           ),
                           title: Text(contact['name']),
                           subtitle: Text(contact['phoneNumber']),
-                          onTap: () {},
+                          onTap: () {
+                            getIt<AppRouter>().pop();
+                            getIt<AppRouter>().push(
+                              ChatPage(
+                                reciverId: contact['id'],
+                                reciverName: contact['name'],
+                              ),
+                            );
+                          },
                         );
                       },
                     );
