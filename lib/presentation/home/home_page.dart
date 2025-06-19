@@ -1,11 +1,15 @@
-import 'package:chat_app/core/theme/color.dart';
+import 'dart:developer';
+
 import 'package:chat_app/core/router/app_router.dart';
+import 'package:chat_app/data/repositories/auth_repository.dart';
+import 'package:chat_app/data/repositories/chat_repository.dart';
 import 'package:chat_app/data/repositories/contact_repository.dart';
 import 'package:chat_app/presentation/auth/login_page.dart';
 import 'package:chat_app/logic/auth_cubit/auth_cubit.dart';
 import 'package:chat_app/logic/auth_cubit/auth_state.dart';
 import 'package:chat_app/data/service/service_locator.dart';
 import 'package:chat_app/presentation/chat/chat_page.dart';
+import 'package:chat_app/presentation/widget/contect_list_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -18,9 +22,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late final ContactRepository _contactRepository;
+  late final ChatRepository _chatRepository;
+  late final String currentUserId;
   @override
   void initState() {
     _contactRepository = getIt<ContactRepository>();
+    _chatRepository = getIt<ChatRepository>();
+    currentUserId = getIt<AuthRepository>().auth.currentUser!.uid;
     super.initState();
   }
 
@@ -110,23 +118,38 @@ class _HomePageState extends State<HomePage> {
             onPressed: () => _showContactList(context),
             child: Icon(Icons.chat_rounded, color: Colors.white),
           ),
-          body: ListView.builder(
-            itemCount: 10,
-            itemBuilder: (context, index) {
-              return ListTile(
-                leading: CircleAvatar(
-                  child: Image.asset('assets/image/google.png'),
-                ),
-                title: Text('parth'),
-                subtitle: Text('new message'),
-                trailing: Card(
-                  shape: CircleBorder(),
-                  color: ColorPalette.primery,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text('1'),
-                  ),
-                ),
+          body: StreamBuilder(
+            stream: _chatRepository.getChatRoom(currentUserId),
+            builder: (context, asyncSnapshot) {
+              if (asyncSnapshot.hasError) {
+                log(asyncSnapshot.error.toString());
+                return Center(child: Text('something went worng'));
+              } else if (!asyncSnapshot.hasData) {
+                return Center(child: Text('no chat yet'));
+              }
+              final data = asyncSnapshot.data!;
+              return ListView.builder(
+                itemCount: data.length,
+                itemBuilder: (context, index) {
+                  return ContectListTile(
+                    chat: data.first,
+                    currentUserId: currentUserId,
+                    onTap: () {
+                      final otherUserId = data.first.participants.firstWhere(
+                        (id) => id != currentUserId,
+                      );
+                      final otherUserName =
+                          data.first.participantsName![otherUserId] ??
+                          'Unknown';
+                      getIt<AppRouter>().push(
+                        ChatPage(
+                          receiverId: otherUserId,
+                          reciverName: otherUserName,
+                        ),
+                      );
+                    },
+                  );
+                },
               );
             },
           ),

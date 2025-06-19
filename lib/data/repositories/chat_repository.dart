@@ -121,4 +121,16 @@ class ChatRepository extends BaseReposisory {
 
     return snapshot.docs.map((doc) => MessageModel.fromFirestore(doc)).toList();
   }
+
+  Stream<List<ChatRoomModel>> getChatRoom(String userId) {
+    return _chatRooms
+        .where('participants', arrayContains: userId)
+        .orderBy('lastMessageTime', descending: true)
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => ChatRoomModel.fromFireStore(doc))
+              .toList(),
+        );
+  }
 }

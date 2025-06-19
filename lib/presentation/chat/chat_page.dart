@@ -32,11 +32,13 @@ class _ChatPageState extends State<ChatPage> {
 
   Future<void> _handelSendMessage() async {
     final messageContent = _messageController.text.trim();
-    _messageController.clear();
-    await _chatCubit.sendMessage(
-      content: messageContent,
-      receiverId: widget.receiverId,
-    );
+    if (messageContent != "") {
+      _messageController.clear();
+      await _chatCubit.sendMessage(
+        content: messageContent,
+        receiverId: widget.receiverId,
+      );
+    }
   }
 
   @override
