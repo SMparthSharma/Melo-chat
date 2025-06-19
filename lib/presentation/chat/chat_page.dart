@@ -1,14 +1,16 @@
 import 'package:chat_app/core/theme/color.dart';
 import 'package:chat_app/data/models/message_model.dart';
+import 'package:chat_app/data/service/service_locator.dart';
+import 'package:chat_app/logic/chat_cubit/chat_cubit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ChatPage extends StatefulWidget {
-  final String reciverId;
+  final String receiverId;
   final String reciverName;
   const ChatPage({
     super.key,
-    required this.reciverId,
+    required this.receiverId,
     required this.reciverName,
   });
 
@@ -18,6 +20,24 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _messageController = TextEditingController();
+  late final ChatCubit _chatCubit;
+
+  @override
+  void initState() {
+    _chatCubit = getIt<ChatCubit>();
+    _chatCubit.enterChat(widget.receiverId);
+    super.initState();
+  }
+
+  Future<void> _handelSendMessage() async {
+    final messageContent = _messageController.text.trim();
+    _messageController.clear();
+    await _chatCubit.sendMessage(
+      content: messageContent,
+      receiverId: widget.receiverId,
+    );
+  }
+
   @override
   void dispose() {
     _messageController.dispose();
@@ -96,7 +116,7 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: _handelSendMessage,
                   icon: Icon(Icons.send_rounded, size: 30),
                 ),
               ],

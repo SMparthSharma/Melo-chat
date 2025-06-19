@@ -68,7 +68,7 @@ class _HomePageState extends State<HomePage> {
                             getIt<AppRouter>().pop();
                             getIt<AppRouter>().push(
                               ChatPage(
-                                reciverId: contact['id'],
+                                receiverId: contact['id'],
                                 reciverName: contact['name'],
                               ),
                             );
