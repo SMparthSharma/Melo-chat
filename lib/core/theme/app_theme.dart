@@ -34,7 +34,6 @@ class AppTheme {
       ),
       iconTheme: IconThemeData(color: Colors.white),
     ),
-
     // Textfiled theme
     inputDecorationTheme: InputDecorationTheme(
       hintStyle: TextStyle(color: Colors.grey),

@@ -133,4 +133,12 @@ class ChatRepository extends BaseReposisory {
               .toList(),
         );
   }
+
+  Stream<int> getUnreadCount(String chatRoomId, String userId) {
+    return getChatRoomMessage(chatRoomId)
+        .where('receiverId', isEqualTo: userId)
+        .where('status', isEqualTo: MessageStatus.sent.toString())
+        .snapshots()
+        .map((snapshot) => snapshot.docs.length);
+  }
 }
