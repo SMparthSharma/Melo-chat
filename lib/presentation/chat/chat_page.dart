@@ -2,8 +2,9 @@ import 'package:chat_app/core/theme/color.dart';
 import 'package:chat_app/data/models/message_model.dart';
 import 'package:chat_app/data/service/service_locator.dart';
 import 'package:chat_app/logic/chat_cubit/chat_cubit.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:chat_app/logic/chat_cubit/chat_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ChatPage extends StatefulWidget {
   final String receiverId;
@@ -72,57 +73,57 @@ class _ChatPageState extends State<ChatPage> {
           IconButton(onPressed: () {}, icon: Icon(Icons.more_vert_rounded)),
         ],
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 10),
-          Expanded(
-            child: ListView.builder(
-              itemCount: 10,
-              itemBuilder: (context, index) {
-                return MessageBubble(
-                  message: MessageModel(
-                    id: '345',
-                    chatRoomId: '348597',
-                    senderId: '45345',
-                    receiverId: '435345',
-                    content:
-                        'Thank you for getting back to me. I appreciate your response.Please do keep me in mind for any future openings that align with my profile. I would be happy to connect again if any opportunities arise.',
-                    timestamp: Timestamp.now(),
-                    readBy: [],
-                    status: MessageStatus.read,
-                  ),
+      body: BlocBuilder<ChatCubit, ChatState>(
+        bloc: _chatCubit,
+        builder: (context, state) {
+          if (state.status == ChatStatus.loading) {
+            return Center(child: CircularProgressIndicator());
+          } else if (state.status == ChatStatus.error) {
+            return Center(child: Text('something went wrong'));
+          }
+          return Column(
+            children: [
+              const SizedBox(height: 10),
+              Expanded(
+                child: ListView.builder(
+                  reverse: true,
 
-                  isMe: index % 2 == 0,
-                );
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    keyboardType: TextInputType.multiline,
-                    decoration: InputDecoration(
-                      hintText: 'Message',
-                      prefixIcon: Icon(
-                        Icons.emoji_emotions_rounded,
-                        color: Colors.orange,
-                        size: 30,
+                  itemCount: state.messages.length,
+                  itemBuilder: (context, index) {
+                    final message = state.messages[index];
+                    final isMe = message.senderId == _chatCubit.currentUserId;
+                    return MessageBubble(message: message, isMe: isMe);
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _messageController,
+                        keyboardType: TextInputType.multiline,
+                        decoration: InputDecoration(
+                          hintText: 'Message',
+                          prefixIcon: Icon(
+                            Icons.emoji_emotions_rounded,
+                            color: Colors.orange,
+                            size: 30,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    IconButton(
+                      onPressed: _handelSendMessage,
+                      icon: Icon(Icons.send_rounded, size: 30),
+                    ),
+                  ],
                 ),
-                IconButton(
-                  onPressed: _handelSendMessage,
-                  icon: Icon(Icons.send_rounded, size: 30),
-                ),
-              ],
-            ),
-          ),
-        ],
+              ),
+            ],
+          );
+        },
       ),
     );
   }
