@@ -27,7 +27,7 @@ Future<void> setupServiceLocator() async {
   getIt.registerLazySingleton(
     () => AuthCubit(authRepository: AuthRepository()),
   );
-  getIt.registerLazySingleton(
+  getIt.registerFactory(
     () => ChatCubit(
       chatRepository: ChatRepository(),
       currentUserId: getIt<FirebaseAuth>().currentUser!.uid,

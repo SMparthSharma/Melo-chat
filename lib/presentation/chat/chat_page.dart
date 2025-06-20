@@ -5,6 +5,7 @@ import 'package:chat_app/logic/chat_cubit/chat_cubit.dart';
 import 'package:chat_app/logic/chat_cubit/chat_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
 class ChatPage extends StatefulWidget {
   final String receiverId;
@@ -27,6 +28,7 @@ class _ChatPageState extends State<ChatPage> {
   void initState() {
     _chatCubit = getIt<ChatCubit>();
     _chatCubit.enterChat(widget.receiverId);
+
     super.initState();
   }
 
@@ -44,6 +46,7 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void dispose() {
     _messageController.dispose();
+    _chatCubit.leaveChat();
     super.dispose();
   }
 
@@ -171,13 +174,13 @@ class MessageBubble extends StatelessWidget {
               ),
             ),
             SizedBox(
-              width: 50,
+              width: 70,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 spacing: 5,
                 children: [
                   Text(
-                    '5:00',
+                    DateFormat('hh:mm a').format(message.timestamp.toDate()),
                     style: TextStyle(
                       color: isMe ? Colors.white : Colors.black,
                       fontSize: 10,
@@ -189,7 +192,7 @@ class MessageBubble extends StatelessWidget {
                           color: message.status == MessageStatus.read
                               ? Colors.green
                               : Colors.white,
-                          size: 16,
+                          size: 12,
                         )
                       : Text(''),
                 ],

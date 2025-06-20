@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:chat_app/data/repositories/chat_repository.dart';
 import 'package:chat_app/logic/chat_cubit/chat_state.dart';
@@ -8,6 +9,7 @@ class ChatCubit extends Cubit<ChatState> {
   final ChatRepository _chatRepository;
   final String currentUserId;
   StreamSubscription? _messageSubscription;
+  bool isInChatPage = false;
   ChatCubit({
     required ChatRepository chatRepository,
     required this.currentUserId,
@@ -15,6 +17,7 @@ class ChatCubit extends Cubit<ChatState> {
        super(const ChatState());
 
   void enterChat(String receiverId) async {
+    isInChatPage = true;
     emit(state.copyWith(status: ChatStatus.loading));
     try {
       final chatRoom = await _chatRepository.getOrCreateChatRoom(
@@ -69,6 +72,9 @@ class ChatCubit extends Cubit<ChatState> {
         .getMessage(chatRoomId)
         .listen(
           (messages) {
+            if (isInChatPage) {
+              _markMessageAsRead(chatRoomId);
+            }
             emit(state.copyWith(messages: messages, error: null));
           },
           onError: (error) {
@@ -80,5 +86,17 @@ class ChatCubit extends Cubit<ChatState> {
             );
           },
         );
+  }
+
+  Future<void> _markMessageAsRead(String chatRoomId) async {
+    try {
+      await _chatRepository.markMessagesAsRead(chatRoomId, currentUserId);
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  Future<void> leaveChat() async {
+    isInChatPage = false;
   }
 }

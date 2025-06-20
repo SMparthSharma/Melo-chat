@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:chat_app/data/models/chat_room_model.dart';
 import 'package:chat_app/data/models/message_model.dart';
 import 'package:chat_app/data/service/base_repository.dart';
@@ -140,5 +142,32 @@ class ChatRepository extends BaseReposisory {
         .where('status', isEqualTo: MessageStatus.sent.toString())
         .snapshots()
         .map((snapshot) => snapshot.docs.length);
+  }
+
+  Future<void> markMessagesAsRead(String chatRoomId, String userId) async {
+    try {
+      final batch = firestore.batch();
+
+      //get all unread messages where user is receviver
+
+      final unreadMessages = await getChatRoomMessage(chatRoomId)
+          .where("receiverId", isEqualTo: userId)
+          .where('status', isEqualTo: MessageStatus.sent.toString())
+          .get();
+      log("found ${unreadMessages.docs.length} unread messages");
+
+      for (final doc in unreadMessages.docs) {
+        batch.update(doc.reference, {
+          'readBy': FieldValue.arrayUnion([userId]),
+          'status': MessageStatus.read.toString(),
+        });
+
+        await batch.commit();
+
+        log("Marked messaegs as read for user $userId");
+      }
+    } catch (e) {
+      log(e.toString());
+    }
   }
 }
