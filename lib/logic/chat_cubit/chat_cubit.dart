@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:chat_app/data/repositories/chat_repository.dart';
 import 'package:chat_app/logic/chat_cubit/chat_state.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ChatCubit extends Cubit<ChatState> {
@@ -10,6 +11,11 @@ class ChatCubit extends Cubit<ChatState> {
   final String currentUserId;
   StreamSubscription? _messageSubscription;
   bool isInChatPage = false;
+  StreamSubscription? _onlineStatusSubscription;
+  StreamSubscription? _typingSubscription;
+  // StreamSubscription? _blockStatusSubscription;
+  // StreamSubscription? _amIBlockStatusSubscription;
+  Timer? typingTimer;
   ChatCubit({
     required ChatRepository chatRepository,
     required this.currentUserId,
@@ -32,6 +38,10 @@ class ChatCubit extends Cubit<ChatState> {
         ),
       );
       _subscriptionMessage(chatRoom.id);
+      _subscribeToOnlineStatus(receiverId);
+      _subscribeToTypingStatus(chatRoom.id);
+      await _chatRepository.updateOnlineStatus(currentUserId, true);
+      //  await _chatRepository.updateTypingStatus(chatRoom.id, receiverId, true);
     } catch (e) {
       emit(
         state.copyWith(
@@ -98,5 +108,48 @@ class ChatCubit extends Cubit<ChatState> {
 
   Future<void> leaveChat() async {
     isInChatPage = false;
+  }
+
+  void _subscribeToOnlineStatus(String userId) {
+    _onlineStatusSubscription?.cancel();
+    _onlineStatusSubscription = _chatRepository
+        .getUserOnlineStatus(userId)
+        .listen(
+          (status) {
+            final isOnline = status["isOnline"] as bool;
+            final lastSeen = status["lastSeen"] as Timestamp?;
+
+            emit(
+              state.copyWith(
+                isReceiverOnline: isOnline,
+                receiverLastSeen: lastSeen,
+              ),
+            );
+          },
+          onError: (error) {
+            log("error getting online status");
+          },
+        );
+  }
+
+  void _subscribeToTypingStatus(String chatRoomId) {
+    _typingSubscription?.cancel();
+    _typingSubscription = _chatRepository
+        .getTypingStatus(chatRoomId)
+        .listen(
+          (status) {
+            final isTyping = status["isTyping"] as bool;
+            final typingUserId = status["typingUserId"] as String?;
+
+            emit(
+              state.copyWith(
+                isReceiverTyping: isTyping && typingUserId != currentUserId,
+              ),
+            );
+          },
+          onError: (error) {
+            log("error getting online status");
+          },
+        );
   }
 }

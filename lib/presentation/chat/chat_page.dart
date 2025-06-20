@@ -3,6 +3,7 @@ import 'package:chat_app/data/models/message_model.dart';
 import 'package:chat_app/data/service/service_locator.dart';
 import 'package:chat_app/logic/chat_cubit/chat_cubit.dart';
 import 'package:chat_app/logic/chat_cubit/chat_state.dart';
+import 'package:chat_app/presentation/widget/loading_dots.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -66,9 +67,40 @@ class _ChatPageState extends State<ChatPage> {
               children: [
                 Text(widget.reciverName),
                 const SizedBox(height: 5),
-                Text(
-                  'online',
-                  style: TextStyle(fontSize: 12, color: Colors.green),
+                BlocBuilder<ChatCubit, ChatState>(
+                  bloc: _chatCubit,
+                  builder: (context, state) {
+                    if (state.isReceiverTyping) {
+                      return Row(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.only(right: 4),
+                            child: const LoadingDots(),
+                          ),
+                          Text(
+                            "typing",
+                            style: TextStyle(
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                    if (state.isReceiverOnline) {
+                      return const Text(
+                        "Online",
+                        style: TextStyle(fontSize: 14, color: Colors.green),
+                      );
+                    }
+                    if (state.receiverLastSeen != null) {
+                      final lastSeen = state.receiverLastSeen!.toDate();
+                      return Text(
+                        "last seen at ${DateFormat('h:mm a').format(lastSeen)}",
+                        style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                      );
+                    }
+                    return const SizedBox();
+                  },
                 ),
               ],
             ),
