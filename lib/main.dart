@@ -31,8 +31,8 @@ class _MyAppState extends State<MyApp> {
           userId: state.user!.uid,
           chatRepository: getIt<ChatRepository>(),
         );
+        WidgetsBinding.instance.addObserver(_lifeCycleObserver);
       }
-      WidgetsBinding.instance.addObserver(_lifeCycleObserver);
     });
     super.initState();
   }

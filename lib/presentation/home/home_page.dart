@@ -124,10 +124,12 @@ class _HomePageState extends State<HomePage> {
               if (asyncSnapshot.hasError) {
                 log(asyncSnapshot.error.toString());
                 return Center(child: Text('something went worng'));
-              } else if (!asyncSnapshot.hasData) {
+              } else if (!asyncSnapshot.hasData ||
+                  asyncSnapshot.data!.isEmpty) {
                 return Center(child: Text('no chat yet'));
               }
               final data = asyncSnapshot.data!;
+              log('check if the data presant $data');
               return ListView.builder(
                 itemCount: data.length,
                 itemBuilder: (context, index) {

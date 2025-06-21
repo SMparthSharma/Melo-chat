@@ -24,11 +24,13 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _messageController = TextEditingController();
   late final ChatCubit _chatCubit;
+  bool _isComposing = false;
 
   @override
   void initState() {
     _chatCubit = getIt<ChatCubit>();
     _chatCubit.enterChat(widget.receiverId);
+    _messageController.addListener(_onTextChanged);
 
     super.initState();
   }
@@ -41,6 +43,18 @@ class _ChatPageState extends State<ChatPage> {
         content: messageContent,
         receiverId: widget.receiverId,
       );
+    }
+  }
+
+  void _onTextChanged() {
+    final isComposing = _messageController.text.isNotEmpty;
+    if (isComposing != _isComposing) {
+      setState(() {
+        _isComposing = isComposing;
+      });
+      if (isComposing) {
+        _chatCubit.startTyping();
+      }
     }
   }
 
@@ -73,15 +87,13 @@ class _ChatPageState extends State<ChatPage> {
                     if (state.isReceiverTyping) {
                       return Row(
                         children: [
+                          Text(
+                            "typing",
+                            style: TextStyle(fontSize: 14, color: Colors.white),
+                          ),
                           Container(
                             margin: const EdgeInsets.only(right: 4),
                             child: const LoadingDots(),
-                          ),
-                          Text(
-                            "typing",
-                            style: TextStyle(
-                              color: Theme.of(context).primaryColor,
-                            ),
                           ),
                         ],
                       );

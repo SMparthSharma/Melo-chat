@@ -152,4 +152,27 @@ class ChatCubit extends Cubit<ChatState> {
           },
         );
   }
+
+  void startTyping() {
+    if (state.chatRoomId == null) return;
+    typingTimer?.cancel();
+    _updateTypingStatus(true);
+    typingTimer = Timer(const Duration(seconds: 3), () {
+      _updateTypingStatus(false);
+    });
+  }
+
+  Future<void> _updateTypingStatus(bool isTyping) async {
+    if (state.chatRoomId == null) return;
+
+    try {
+      await _chatRepository.updateTypingStatus(
+        state.chatRoomId!,
+        currentUserId,
+        isTyping,
+      );
+    } catch (e) {
+      log("error updating typing status $e");
+    }
+  }
 }

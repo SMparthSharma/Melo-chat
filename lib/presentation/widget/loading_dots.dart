@@ -34,10 +34,7 @@ class _LoadingDotsState extends State<LoadingDots>
         return AnimatedBuilder(
           animation: _controller,
           builder: (context, child) {
-            final animation = Tween(
-              begin: 0.0,
-              end: 1.0,
-            ).animate(
+            final animation = Tween(begin: 0.0, end: 1.0).animate(
               CurvedAnimation(
                 parent: _controller,
                 curve: Interval(
@@ -53,9 +50,7 @@ class _LoadingDotsState extends State<LoadingDots>
               height: 4,
               margin: const EdgeInsets.symmetric(horizontal: 2),
               decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(
-                      0.3 + (0.7 * animation.value),
-                    ),
+                color: Colors.white.withOpacity(0.3 + (0.7 * animation.value)),
                 shape: BoxShape.circle,
               ),
             );
