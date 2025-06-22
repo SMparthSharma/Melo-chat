@@ -32,7 +32,9 @@ class _SplashPageState extends State<SplashPage> {
         }
       },
       builder: (context, state) {
-        return Scaffold(body: Center(child: Icon(Icons.chat, size: 50)));
+        return Scaffold(
+          body: Center(child: Image.asset('assets/image/melo_logo.png')),
+        );
       },
     );
   }

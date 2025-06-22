@@ -214,15 +214,7 @@ class _ChatPageState extends State<ChatPage> {
                       ),
                     ),
                     IconButton(
-                      onPressed: () {
-                        // if (state.blocked) {
-                        //   log('user is block');
-                        // }
-                        // if (state.isUserBlocked) {
-                        //   log('user is isUserBlocked');
-                        // }
-                        _handelSendMessage;
-                      },
+                      onPressed: _handelSendMessage,
                       icon: Icon(Icons.send_rounded, size: 30),
                     ),
                   ],

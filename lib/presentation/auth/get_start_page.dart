@@ -15,7 +15,7 @@ class GetStartPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         spacing: 50,
         children: [
-          Center(child: Image.asset('assets/image/icon.png')),
+          Center(child: Image.asset('assets/image/melo_logo.png')),
           //  const SizedBox(height: 50),
           SizedBox(
             width: MediaQuery.of(context).size.width * 0.7,

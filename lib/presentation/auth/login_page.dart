@@ -95,7 +95,7 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 Center(
                   child: Image.asset(
-                    'assets/image/icon.png',
+                    'assets/image/melo_logo.png',
                     height: 120,
                     width: 120,
                   ),
