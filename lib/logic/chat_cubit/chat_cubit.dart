@@ -13,8 +13,8 @@ class ChatCubit extends Cubit<ChatState> {
   bool isInChatPage = false;
   StreamSubscription? _onlineStatusSubscription;
   StreamSubscription? _typingSubscription;
-  // StreamSubscription? _blockStatusSubscription;
-  // StreamSubscription? _amIBlockStatusSubscription;
+  StreamSubscription? _blockStatusSubscription;
+  StreamSubscription? _amIBlockStatusSubscription;
   Timer? typingTimer;
   ChatCubit({
     required ChatRepository chatRepository,
@@ -40,8 +40,8 @@ class ChatCubit extends Cubit<ChatState> {
       _subscriptionMessage(chatRoom.id);
       _subscribeToOnlineStatus(receiverId);
       _subscribeToTypingStatus(chatRoom.id);
+      _subscribeToBlockStatus(receiverId);
       await _chatRepository.updateOnlineStatus(currentUserId, true);
-      //  await _chatRepository.updateTypingStatus(chatRoom.id, receiverId, true);
     } catch (e) {
       emit(
         state.copyWith(
@@ -153,6 +153,27 @@ class ChatCubit extends Cubit<ChatState> {
         );
   }
 
+  void _subscribeToBlockStatus(String otherUserId) {
+    _blockStatusSubscription?.cancel();
+    _blockStatusSubscription = _chatRepository
+        .isUserBlocked(currentUserId, otherUserId)
+        .listen(
+          (isBlocked) {
+            emit(state.copyWith(isUserBlocked: isBlocked));
+
+            _amIBlockStatusSubscription?.cancel();
+            _blockStatusSubscription = _chatRepository
+                .amIBlocked(currentUserId, otherUserId)
+                .listen((isBlocked) {
+                  emit(state.copyWith(blocked: isBlocked));
+                });
+          },
+          onError: (error) {
+            log("error getting online status");
+          },
+        );
+  }
+
   void startTyping() {
     if (state.chatRoomId == null) return;
     typingTimer?.cancel();
@@ -173,6 +194,22 @@ class ChatCubit extends Cubit<ChatState> {
       );
     } catch (e) {
       log("error updating typing status $e");
+    }
+  }
+
+  Future<void> blockUser(String userId) async {
+    try {
+      await _chatRepository.blockUser(currentUserId, userId);
+    } catch (e) {
+      emit(state.copyWith(error: 'failed to block user $e'));
+    }
+  }
+
+  Future<void> unBlockUser(String userId) async {
+    try {
+      await _chatRepository.unBlockUser(currentUserId, userId);
+    } catch (e) {
+      emit(state.copyWith(error: 'failed to unblock user $e'));
     }
   }
 }

@@ -119,7 +119,57 @@ class _ChatPageState extends State<ChatPage> {
           ],
         ),
         actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.more_vert_rounded)),
+          BlocBuilder<ChatCubit, ChatState>(
+            bloc: _chatCubit,
+            builder: (context, state) {
+              if (state.isUserBlocked) {
+                return TextButton.icon(
+                  onPressed: () => _chatCubit.unBlockUser(widget.receiverId),
+                  label: const Text(
+                    "Unblock",
+                    style: TextStyle(fontSize: 14, color: Colors.green),
+                  ),
+                );
+              }
+              return PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert),
+                onSelected: (value) async {
+                  if (value == "block") {
+                    final bool? confirm = await showDialog<bool>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text("Are you sure you want to block "),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text("Cancel"),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.pop(context, true),
+                            child: const Text(
+                              "Block",
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                    if (confirm == true) {
+                      await _chatCubit.blockUser(widget.receiverId);
+                    }
+                  }
+                },
+                itemBuilder: (context) => <PopupMenuEntry<String>>[
+                  const PopupMenuItem(
+                    value: 'block',
+                    child: Text("Block User"),
+                  ),
+                ],
+              );
+            },
+          ),
         ],
       ),
       body: BlocBuilder<ChatCubit, ChatState>(
@@ -164,7 +214,15 @@ class _ChatPageState extends State<ChatPage> {
                       ),
                     ),
                     IconButton(
-                      onPressed: _handelSendMessage,
+                      onPressed: () {
+                        // if (state.blocked) {
+                        //   log('user is block');
+                        // }
+                        // if (state.isUserBlocked) {
+                        //   log('user is isUserBlocked');
+                        // }
+                        _handelSendMessage;
+                      },
                       icon: Icon(Icons.send_rounded, size: 30),
                     ),
                   ],
